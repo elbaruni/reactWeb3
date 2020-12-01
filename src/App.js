@@ -17,12 +17,16 @@ const App = props => {
  const getRVCBalance=async ()=>{
  
      const rvcContract=await new window.web3.eth.Contract(rvc.abi, rvc.address) 
-    const b=await rvcContract.methods.balanceOf(account).call()
-    setBalance(window.web3.utils.fromWei( b,'ether') )
+    /* const b=await rvcContract.methods.balanceOf(account).call()
+    setBalance(window.web3.utils.fromWei( b,'ether') ) */
    
  }
  
- const getAccount=()=>{
+ const getAccount=async ()=>{
+
+  const web3 = window.web3
+  // Load account
+  const accounts = await web3.eth.getAccounts()
     window.ethereum.on('accountsChanged', function (accounts) {
         setAccount(accounts[0])
       
@@ -40,6 +44,7 @@ const  connectWeb3=async()=>{
   if (window.ethereum) {
     window.web3 = new Web3(window.ethereum)
     await window.ethereum.enable()
+    getAccount()  
     getRVCBalance()  
   }
   else if (window.web3) {
