@@ -17,16 +17,27 @@ const App = props => {
  const getRVCBalance=async ()=>{
  
      const rvcContract=await new window.web3.eth.Contract(rvc.abi, rvc.address) 
-    /* const b=await rvcContract.methods.balanceOf(account).call()
-    setBalance(window.web3.utils.fromWei( b,'ether') ) */
+      const b=await rvcContract.methods.balanceOf(account).call()
+    setBalance(window.web3.utils.fromWei( b,'ether') )  
    
  }
- 
+ const writeFunction=async()=>{
+  const web3= new Web3
+  const BN = web3.utils.BN;
+
+  
+  const user="0xf26D566aF179f5499108C459ef41725F370447c9"
+  const amount=new BN(1234) ;
+  const rvcContract=await new window.web3.eth.Contract(rvc.abi, rvc.address) 
+  const b=await rvcContract.methods.approve(user,amount).send({from:account})
+ console.log(b)
+ }
  const getAccount=async ()=>{
 
   const web3 = window.web3
   // Load account
   const accounts = await web3.eth.getAccounts()
+  setAccount(accounts[0])
     window.ethereum.on('accountsChanged', function (accounts) {
         setAccount(accounts[0])
       
@@ -34,7 +45,7 @@ const App = props => {
  }
   useEffect(() => {
    
-      getAccount()  
+      
    
       
     
@@ -59,6 +70,7 @@ const  connectWeb3=async()=>{
     <React.Fragment>
       <p>{account}</p>
       <p>{balance}</p>
+      <button id="test" onClick={writeFunction}>test</button>
       <button onClick={connectWeb3}>connect</button>
        
     </React.Fragment>
