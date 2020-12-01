@@ -54,7 +54,7 @@ const  connectWeb3=async()=>{
     <React.Fragment>
       <p>{account}</p>
       <p>{balance}</p>
-      <button onClick={connectWeb3}>Light Side</button>
+      <button onClick={connectWeb3}>connect</button>
        
     </React.Fragment>
   );
