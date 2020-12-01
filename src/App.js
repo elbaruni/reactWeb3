@@ -15,11 +15,11 @@ const App = props => {
 
  //Function to check if account changed and set it to account state 
  const getRVCBalance=async ()=>{
-    console.log(window.web3 )
+ 
      const rvcContract=await new window.web3.eth.Contract(rvc.abi, rvc.address) 
     const b=await rvcContract.methods.balanceOf(account).call()
     setBalance(window.web3.utils.fromWei( b,'ether') )
-   console.log(rvcContract,b)  
+   
  }
  
  const getAccount=()=>{
@@ -29,9 +29,9 @@ const App = props => {
   })  
  }
   useEffect(() => {
-    console.log(window.web3.currentProvider._state )
+   
       getAccount()  
-  /*   console.log(rvc) */
+   
       
     
   }, [ ]);
