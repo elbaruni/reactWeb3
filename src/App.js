@@ -2,6 +2,8 @@ import Web3 from 'web3';
 import React, { useState,useEffect } from 'react';
 import rcvr from "./contracts/RCVR.json";
 import migration from "./contracts/Migration.json"
+import deadtoken from "./contracts/DeadToken.json"
+import BigNumber from 'bignumber.js';
 
 const networks={
   "1":"MainNet",
@@ -108,6 +110,26 @@ const App = props => {
     console.log(e.message)
   }
  }
+
+ const approve=async()=>{
+  try {  
+    if(networkId=="3"){
+      const web3= new Web3;
+
+      const maxAmount = new BigNumber(1).multipliedBy(new BigNumber(2).pow(256)).minus(1);
+      const deadtokenContract=await new window.web3.eth.Contract(deadtoken.abi, deadtoken.address) 
+      const txHash=await deadtokenContract.methods.approve(migration.address, maxAmount.toString(10)).send({from:account})
+     
+     console.log(txHash.transactionHash)
+    }else{
+      console.log("wrong network")
+    }
+   }
+  catch(e){
+    console.log(e.message)
+  }
+ }
+
  const migrate=async()=>{
   try {  
     if(networkId=="3"){
@@ -125,7 +147,6 @@ const App = props => {
     console.log(e.message)
   }
  }
-
  
  const getAccount=async ()=>{
   const web3 = window.web3
@@ -184,7 +205,8 @@ const  connectWeb3=async()=>{
         </p>
         <hr/>
         <p>
-          <button id="btn5" onClick={migrate}>Migrate</button>
+          <button id="btn5" onClick={approve}>Approve</button>
+          <button id="btn6" onClick={migrate}>Migrate</button>
         </p>
         <hr/>
        </div>
