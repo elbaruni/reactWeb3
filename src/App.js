@@ -164,6 +164,7 @@ const  connectWeb3=async()=>{
   let content = (
     <React.Fragment>
       <div  style={{padding:'30px'}}>
+        <h1> RCVR token UI</h1>
         <p>Address: {account}</p>
         <p>RCVR Balance: {balance}</p>
         <p>NetworkId: { networks[networkId]}</p>
@@ -185,6 +186,7 @@ const  connectWeb3=async()=>{
         <p>
           <button id="btn5" onClick={migrate}>Migrate</button>
         </p>
+        <hr/>
        </div>
     </React.Fragment>
   );
