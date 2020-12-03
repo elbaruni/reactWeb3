@@ -14,29 +14,19 @@ const networks={
 }
 
 const App = props => {
+  const [windowWeb3,setWindowWeb3]=useState(null)
   const [account,setAccount]=useState("")
+  const[locked,setLocked]=useState(true)
   const [balance,setBalance]=useState(0)
-  const [networkId,setNetworkId]=useState("")
+  const [networkId,setNetworkId]=useState( "")
+  const [metamaskInstalled,setMetamaskInstalled]=useState(false)
+
+  
+  
   const [stake,setStake]=useState("")
   
   //Function to check if account changed and set it to account state 
- const getRCVRBalance=async ()=>{
-
-  try {  
-    if(networkId=="3"){
-      const rcvrContract=await new window.web3.eth.Contract(rcvr.abi, rcvr.address) 
-      const balance=await rcvrContract.methods.balanceOf(account).call()
-      setBalance(window.web3.utils.fromWei( balance,'ether') )  
-    } else {
-      console.log("wrong network")
-      setBalance(null)  
-    }
-  }
-  catch(e){
-    console.log(e.message)
-  }
- }
-
+ 
  const createSafeStake=async()=>{
   try {  
     if(networkId=="3"){
@@ -148,40 +138,227 @@ const App = props => {
   }
  }
  
- const getAccount=async ()=>{
-  const web3 = window.web3
-  // Load account
-  const accounts = await web3.eth.getAccounts()
-  console.log(accounts)
-  setAccount(accounts[0])
- }
-  useEffect(() => {
-    setNetworkId(window.ethereum.networkVersion)
-    window.ethereum.on('networkChanged', function(networkId){
-      console.log('networkChanged',networkId);
-      setNetworkId(networkId);
-      getRCVRBalance(); 
-    });
-    window.ethereum.on('accountsChanged', function (accounts) {
-      setAccount(accounts[0]);
-      getRCVRBalance();
-    });
-  } ,[]);
+ useEffect(async () => {
+     
+  // const metamaskInstalled = typeof windowWeb3 !== 'undefined'
+   if(  windowWeb3  ){
+    console.log(windowWeb3.currentProvider._state.isUnlocked)
+
+     const accounts = await windowWeb3.eth.getAccounts()
+    
+    
+   if(typeof accounts!= 'undefined' && accounts.length>0) {
+     
+     const networkId = await windowWeb3.eth.net.getId() 
+     if(networkId=="3"){
+    
+     const account=accounts[0]
+     const web3= new Web3()
+     const rvcContract=await new windowWeb3.eth.Contract(rcvr.abi, rcvr.address) 
+     const _balance=await rvcContract.methods.balanceOf(account).call()
+    
+      
+
+    
+     setAccount(accounts[0])
+     setBalance(web3.utils.fromWei(String(_balance),'ether'))
+     setLocked(!windowWeb3.currentProvider._state.isUnlocked)
+     setNetworkId(networkId) 
+     }
+     else{ setNetworkId(networkId)}
+      
+   }
+   else{
+     
+     setAccount('')
+     setBalance(0)
+     setLocked(!windowWeb3.currentProvider._state.isUnlocked)
+     
+      
+      
+   }
+     window.ethereum.on('networkChanged',async function(netId){
+    
+        setNetworkId(netId) 
+      
+       
+     } );
+     window.ethereum.on('accountsChanged',async function (accounts) {
+    
+     
+       if(typeof accounts!=='undefined' && accounts.length>0) {
+       
+           
+         const account=accounts[0]
+         const web3= new Web3()
+         let _balance=0
+         
+         
+         if(networkId=="3"){ 
+          
+         const rvcContract=await new windowWeb3.eth.Contract(rcvr.abi, rcvr.address) 
+           _balance=await rvcContract.methods.balanceOf(account).call() 
+          
+         } 
+        
+           
+         
+         setAccount(accounts[0])
+         setBalance(web3.utils.fromWei(String(_balance),'ether'))
+         setLocked(!windowWeb3.currentProvider._state.isUnlocked)
+         
+        
+       
+         
+       }
+       else{
+         setWindowWeb3(null)
+         setAccount('')
+         setBalance(0)
+         setLocked(true)
+         setWindowWeb3(null)
+         
+         
+          
+         
+       }
+      
+     } );
+     
+   }else{
+     try{
+       if (window.ethereum) {
+         window.web3=new Web3(window.ethereum)
+
+         setWindowWeb3( new Web3(window.ethereum))
+         const web3= new Web3()
+         // Load account
+         const accounts = await  window.web3.eth.getAccounts()
+         const networkId = await  window.web3.eth.net.getId()
+         const account=accounts[0]
+         let _balance=0
+               
+               
+               if(networkId=="3"){ 
+                
+               const rvcContract=await new windowWeb3.eth.Contract(rcvr.abi, rcvr.address) 
+                 _balance=await rvcContract.methods.balanceOf(account).call() 
+                
+               } 
+              
+         
+        
+         
+         setAccount(accounts[0])
+         setBalance(web3.utils.fromWei(String(_balance),'ether'))
+         setLocked(!windowWeb3.currentProvider._state.isUnlocked) 
+         setNetworkId(networkId) 
+        
+         
+       }
+       else if (window.web3) {
+         window.web3=new Web3(window.web3.currentProvider)
+         setWindowWeb3( new Web3(window.web3.currentProvider))
+         const web3= new Web3()
+         // Load account
+         const accounts = await  window.web3.eth.getAccounts()
+         const networkId = await  window.web3.eth.net.getId()
+         const account=accounts[0]
+         let _balance=0
+               
+               
+               if(networkId=="3"){ 
+                
+               const rvcContract=await new windowWeb3.eth.Contract(rcvr.abi, rcvr.address) 
+                 _balance=await rvcContract.methods.balanceOf(account).call() 
+                
+               } 
+              
+         
+        
+               setLocked(!windowWeb3.currentProvider._state.isUnlocked)
+         setAccount(accounts[0])
+         setBalance(web3.utils.fromWei(String(_balance),'ether'))
+          
+         setNetworkId(networkId) 
+       
+       }
+       else {
+         // DO NOTHING...
+       }
+     }
+     catch(e){
+       console.log(e.message)
+     }
+   }
+    
+   
  
+  
+     
+   
+ } ,[windowWeb3]);
+
+ const loadWeb3=async () =>{
+   try{
+     if (window.ethereum) {
+       window.web3=new Web3(window.ethereum)
+       setWindowWeb3( new Web3(window.ethereum))
+       //window.web3 = new Web3(window.ethereum)
+       await window.ethereum.enable()
+     }
+     else if (window.web3) {
+       window.web3=new Web3(window.web3.currentProvider)
+       setWindowWeb3( new Web3(window.web3.currentProvider))
+     //  window.web3 = new Web3(window.web3.currentProvider)
+     }
+     else {
+       // DO NOTHING...
+     }
+   }
+   catch(e){
+     console.log(e.message)
+   }
+ }
+
+ const loadBlockchainData=async ()=> {
+    
+   const web3= new Web3()
+   // Load account
+   const accounts = await  window.web3.eth.getAccounts()
+   const networkId = await  window.web3.eth.net.getId()
+   const account=accounts[0]
+   let _balance=0
+         
+         
+         if(networkId=="3"){ 
+          
+         const rvcContract=await new windowWeb3.eth.Contract(rcvr.abi, rcvr.address) 
+           _balance=await rvcContract.methods.balanceOf(account).call() 
+          
+         } 
+        
+   
+  
+         setLocked(!windowWeb3.currentProvider._state.isUnlocked)
+   setAccount(accounts[0])
+   setBalance(web3.utils.fromWei(String(_balance),'ether'))
+    
+   setNetworkId(networkId) 
+   
+   
+   
+
+    
+ 
+ }
 const  connectWeb3=async()=>{
-  if (window.ethereum) {
-    window.web3 = new Web3(window.ethereum)
-    await window.ethereum.enable()
-  }
-  else if (window.web3) {
-    window.web3 = new Web3(window.web3.currentProvider)
-  }
-  else {
-    window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
-  }
-  getAccount()  
-  await getRCVRBalance()
+ 
+   await   loadWeb3()
+   await   loadBlockchainData()
+ 
 }
+ 
   let content = (
     <React.Fragment>
       <div  style={{padding:'30px'}}>
@@ -189,8 +366,10 @@ const  connectWeb3=async()=>{
         <p>Address: {account}</p>
         <p>RCVR Balance: {balance}</p>
         <p>NetworkId: { networks[networkId]}</p>
+        <p> {!locked? "connected" : "not connected"} </p>
         <p>         
-          <button onClick={connectWeb3}>connect</button>
+        
+       <button onClick={connectWeb3} disabled={!locked}>connect</button> 
         </p>
         <hr/>
         <p>
