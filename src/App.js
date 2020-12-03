@@ -20,7 +20,7 @@ const App = props => {
   const [balance, setBalance] = useState(0)
   const [networkId, setNetworkId] = useState("")
   const [metamaskInstalled, setMetamaskInstalled] = useState(false)
-
+  const [loading,setLoading]=useState(false)
   const [stake, setStake] = useState("")
 
   //Function to check if account changed and set it to account state 
@@ -100,6 +100,7 @@ const App = props => {
   const approve = async () => {
     try {
       if (networkId == "4") {
+        setLoading(true)
         const web3 = new Web3;
 
         const maxAmount = new BigNumber(1).multipliedBy(new BigNumber(2).pow(256)).minus(1);
@@ -107,12 +108,14 @@ const App = props => {
         const txHash = await deadtokenContract.methods.approve(migration.address, maxAmount.toString(10)).send({ from: account })
 
         console.log(txHash.transactionHash)
+        setLoading(false)
       } else {
         console.log("wrong network")
       }
     }
     catch (e) {
       console.log(e.message)
+      setLoading(false)
     }
   }
 
@@ -325,7 +328,7 @@ const App = props => {
         </p>
         <hr />
         <p>
-          <button id="btn5" onClick={approve}>Approve</button>
+          <button id="btn5" onClick={approve} disabled={loading}>{loading ? "Loading ..." : "Approve" }  </button>
           <button id="btn6" onClick={migrate}>Migrate</button>
         </p>
         <hr />
