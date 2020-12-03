@@ -150,6 +150,7 @@ const App = props => {
    if(typeof accounts!= 'undefined' && accounts.length>0) {
      
      const networkId = await windowWeb3.eth.net.getId() 
+     console.log(networkId)
      if(networkId=="3"){
     
      const account=accounts[0]
@@ -165,7 +166,8 @@ const App = props => {
      setLocked(!windowWeb3.currentProvider._state.isUnlocked)
      setNetworkId(networkId) 
      }
-     else{ setNetworkId(networkId)}
+     else{ setNetworkId(networkId)
+      setBalance(0)}
       
    }
    else{
@@ -178,8 +180,34 @@ const App = props => {
       
    }
      window.ethereum.on('networkChanged',async function(netId){
+      const accounts = await windowWeb3.eth.getAccounts()
     
+    
+      if(typeof accounts!= 'undefined' && accounts.length>0) {
+        
+        const networkId = await windowWeb3.eth.net.getId() 
+        console.log(networkId)
+        if(networkId=="3"){
+       
+        const account=accounts[0]
+        const web3= new Web3()
+        const rvcContract=await new windowWeb3.eth.Contract(rcvr.abi, rcvr.address) 
+        const _balance=await rvcContract.methods.balanceOf(account).call()
+       
+         
+   
+       
+        setAccount(accounts[0])
+        setBalance(web3.utils.fromWei(String(_balance),'ether'))
+        setLocked(!windowWeb3.currentProvider._state.isUnlocked)
+        setNetworkId(networkId) 
+        }
+        else{ setNetworkId(networkId)
+         setBalance(0)}
+         
+      }
         setNetworkId(netId) 
+         
       
        
      } );
