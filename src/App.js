@@ -142,7 +142,7 @@ const App = props => {
      
   // const metamaskInstalled = typeof windowWeb3 !== 'undefined'
    if(  windowWeb3  ){
-    console.log(windowWeb3.currentProvider._state.isUnlocked)
+  
 
      const accounts = await windowWeb3.eth.getAccounts()
     
