@@ -10,7 +10,7 @@ const networks = {
   "3": "Ropsten",
   "4": "Rinkeby",
   "5": "Görli",
-  "42": "Kovan "
+  "42": "Kovan"
 }
 
 const App = props => {
